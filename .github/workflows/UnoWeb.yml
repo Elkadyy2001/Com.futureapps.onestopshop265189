@@ -1,29 +1,65 @@
 name: Publish UnoWeb
+
 on:
    workflow_dispatch: # This triggers the workflow manually
+
 jobs:
   build:
+
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
+
+
     - uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.102
-    - name: Create URL file
-      run: |
-        echo "${{ secrets.PROJECTURL }}" > project-url.txt
-    
     - name: Setup Project
       run: |
-        wget -O "AppName.zip" "${{ secrets.PROJECTURL }}"
-    
-    - name: Upload artifacts
+       wget -O "AppName.zip" "https://firebasestorage.googleapis.com/v0/b/app-maker-82b52.appspot.com/o/15222.zip?alt=media&token=e7672c3e-c0ed-4510-88eb-3a84f2de76cf"
+       brew install sevenzip
+       7z x "AppName.zip"
+    - name: Setup Uno
+      run: |
+            dotnet tool install -g uno.check
+            uno-check -v --ci --non-interactive  --skip xcode --skip androidemulator --skip androidsdk --skip dotnetworkloads-9.0.200 --skip git --skip dotnetnewunotemplates --skip openjdk   --target wasm --fix
+
+    - name: Publish App
+      run: |
+         dotnet publish -f net9.0-browserwasm -c Release -o ./publish
+
+    - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: project-files
         path: |
-          project-url.txt
-          AppName.zip
+          ./publish/wwwroot
+    # - name : Send Notifcation To User
+    #   run : |
+    #     curl --location --globoff 'https://api.onesignal.com/notifications' \
+    #     --header 'Content-Type: application/json' \
+    #     --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+    #     --data '{
+    #      "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
+    #     "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
+    #      "contents": {"en": "Succesful Build"}
+    #       }'
+    # - name: Notify on failure
+    #   if: failure()
+    #   run: |
+    #     curl --location --globoff 'https://api.onesignal.com/notifications' \
+    #     --header 'Content-Type: application/json' \
+    #     --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+    #     --data '{
+    #      "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
+    #     "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
+    #      "contents": {"en": "Failed Build"}
+    #       }'
+
+
+
+          
+
+        
 
 
 
