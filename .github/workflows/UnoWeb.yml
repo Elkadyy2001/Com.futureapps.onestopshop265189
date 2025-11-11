@@ -17,43 +17,7 @@ jobs:
     - name: Setup Project
       run: |
        wget -O "AppName.zip" "${{ secrets.PROJECTURL }}"
-       brew install sevenzip
-       7z x "AppName.zip"
-    - name: Setup Uno
-      run: |
-            dotnet tool install -g uno.check
-            uno-check -v --ci --non-interactive  --skip xcode --skip androidemulator --skip androidsdk --skip dotnetworkloads-9.0.200 --skip git --skip dotnetnewunotemplates --skip openjdk   --target wasm --fix
 
-    - name: Publish App
-      run: |
-         dotnet publish -f net9.0-browserwasm -c Release -o ./publish
-
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: |
-          ./publish/wwwroot
-    - name : Send Notifcation To User
-      run : |
-        curl --location --globoff 'https://api.onesignal.com/notifications' \
-        --header 'Content-Type: application/json' \
-        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
-        --data '{
-         "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
-        "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
-         "contents": {"en": "Succesful Build"}
-          }'
-    - name: Notify on failure
-      if: failure()
-      run: |
-        curl --location --globoff 'https://api.onesignal.com/notifications' \
-        --header 'Content-Type: application/json' \
-        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
-        --data '{
-         "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
-        "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
-         "contents": {"en": "Failed Build"}
-          }'
 
 
 
