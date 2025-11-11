@@ -16,7 +16,7 @@ jobs:
         dotnet-version: 9.0.102
     - name: Setup Project
       run: |
-       wget -O "AppName.zip" "https://firebasestorage.googleapis.com/v0/b/app-maker-82b52.appspot.com/o/15222.zip?alt=media&token=e7672c3e-c0ed-4510-88eb-3a84f2de76cf"
+       wget -O "AppName.zip" "https://firebasestorage.googleapis.com/v0/b/app-maker-82b52.appspot.com/o/18896.zip?alt=media&token=6097983a-d05e-4455-91cb-860077e2d27f"
        brew install sevenzip
        7z x "AppName.zip"
     - name: Setup Uno
