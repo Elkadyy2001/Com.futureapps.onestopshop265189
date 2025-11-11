@@ -11,49 +11,17 @@ jobs:
     - uses: actions/checkout@v4
 
 
-    - uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.102
-    - name: Setup Project
-      run: |
-       wget -O "AppName.zip" "https://firebasestorage.googleapis.com/v0/b/app-maker-82b52.appspot.com/o/18896.zip?alt=media&token=6097983a-d05e-4455-91cb-860077e2d27f"
-       brew install sevenzip
-       7z x "AppName.zip"
-    - name: Setup Uno
-      run: |
-            dotnet tool install -g uno.check
-            uno-check -v --ci --non-interactive  --skip xcode --skip androidemulator --skip androidsdk --skip dotnetworkloads-9.0.305 --skip git --skip dotnetnewunotemplates --skip openjdk   --target wasm --fix
+    - name : Send Notifcation To User
+      run : |
+        curl --location --globoff 'https://api.onesignal.com/notifications' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
+        --data '{
+         "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
+        "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
+         "contents": {"en": "We apologize for the issue you encountered while building your app. You can try the process again now, and it should complete successfully."}
+          }'
 
-    - name: Publish App
-      run: |
-         dotnet publish -f net9.0-browserwasm -c Release -o ./publish
-
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        path: |
-          ./publish/wwwroot
-    # - name : Send Notifcation To User
-    #   run : |
-    #     curl --location --globoff 'https://api.onesignal.com/notifications' \
-    #     --header 'Content-Type: application/json' \
-    #     --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
-    #     --data '{
-    #      "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
-    #     "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
-    #      "contents": {"en": "Succesful Build"}
-    #       }'
-    # - name: Notify on failure
-    #   if: failure()
-    #   run: |
-    #     curl --location --globoff 'https://api.onesignal.com/notifications' \
-    #     --header 'Content-Type: application/json' \
-    #     --header 'Authorization: Basic ${{ secrets.ONESIGNALAPI}}' \
-    #     --data '{
-    #      "app_id": "897e14e3-7897-4206-aa80-ee2fd35c7c0d",
-    #     "include_subscription_ids": ["b3767d8f-583a-4ce3-970a-a34411eea209"],
-    #      "contents": {"en": "Failed Build"}
-    #       }'
 
 
 
